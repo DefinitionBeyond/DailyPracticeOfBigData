@@ -5,6 +5,8 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 
 import java.io.IOException;
@@ -40,6 +42,27 @@ public class CreateTable {
             // 通过HColumnDescriptor的一个市里，为HTableDescriptor添加一个列族
             tableDesc.addFamily(new HColumnDescriptor(columFamily));
             // 创建表
+            admin.createTable(tableDesc);
+            System.out.println("create Table success!");
+        }
+    }
+
+    /**
+     * @param tableName   表名
+     * @param columFamily 多个列
+     * @throws IOException
+     */
+    public static void create(String tableName, String[] columFamily) throws IOException {
+        HBaseAdmin admin = new HBaseAdmin(cfg);
+        if (admin.tableExists(tableName)) {
+            System.out.println("table Exists!");
+            System.exit(0);// 退出
+        } else {
+            HTableDescriptor tableDesc = new HTableDescriptor(tableName);
+            for (int i = 0; i < columFamily.length; i++) {
+                HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(columFamily[i].getBytes());
+                tableDesc.addFamily(hColumnDescriptor);
+            }
             admin.createTable(tableDesc);
             System.out.println("create Table success!");
         }

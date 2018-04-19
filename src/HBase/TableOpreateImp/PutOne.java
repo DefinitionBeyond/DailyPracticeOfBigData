@@ -6,6 +6,8 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.IOException;
+
 /**
  * @author liutao
  */
@@ -24,10 +26,10 @@ public class PutOne {
      * @param columFamily 列族
      * @param column 列
      * @param data 数据
-     * @throws Exception
+     * @throws IOException
      */
     public static void add(String tableName, String row, String columFamily, String column, String data)
-            throws Exception {
+            throws IOException {
 
         // 实例一个与Hbase表进行通信的对象
         // 对于多线程的时候，可能会崩溃，建议使用HTablePool
@@ -38,4 +40,23 @@ public class PutOne {
         table.put(p);// 向表中添值
         System.out.println("add " + row + "cloumFamily " + data + " success!");
     }
+
+    /**
+     * @param tableName   表名
+     * @param row         行
+     * @param columFamily 多个列族
+     * @param column      多个列
+     * @param data        每个列指定的数据
+     * @throws IOException
+     */
+    public static void add(String tableName, String row, String[] columFamily, String[] column, String[] data)
+            throws IOException {
+        HTable table = new HTable(cfg, tableName);
+        Put p = new Put(row.getBytes());
+        for (int i = 0; i < columFamily.length; i++) {
+            p.add(columFamily[i].getBytes(), column[i].getBytes(), data[i].getBytes());
+        }
+        table.put(p);
+    }
+
 }
